@@ -86,7 +86,7 @@ module BestInPlace
 
   private
     def build_value_for(object, field, opts)
-      return "" if object.send(field).blank?
+      return "" if object.read_attribute(field.to_sym).blank?
 
       klass = if object.respond_to?(:id)
         "#{object.class}_#{object.id}"
@@ -100,18 +100,18 @@ module BestInPlace
 
       elsif opts[:display_with].try(:is_a?, Proc)
         BestInPlace::DisplayMethods.add_helper_proc(klass, field, opts[:display_with])
-        opts[:display_with].call(object.send(field))
+        opts[:display_with].call(object.read_attribute(field))
 
       elsif opts[:display_with]
         BestInPlace::DisplayMethods.add_helper_method(klass, field, opts[:display_with], opts[:helper_options])
         if opts[:helper_options]
-          BestInPlace::ViewHelpers.send(opts[:display_with], object.send(field), opts[:helper_options])
+          BestInPlace::ViewHelpers.send(opts[:display_with], object.read_attribute(field), opts[:helper_options])
         else
-          BestInPlace::ViewHelpers.send(opts[:display_with], object.send(field))
+          BestInPlace::ViewHelpers.send(opts[:display_with], object.read_attribute(field))
         end
 
       else
-        object.send(field).to_s
+        object.read_attribute(field)
       end
     end
 
